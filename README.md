@@ -58,6 +58,26 @@ In this case the .sqlpile file will be ignored. Also you can just test your curr
     ./sqlpile.sh --new --test /home/jami/sqlpile/test/data-db
 
 The result will be in the compose.sql
+Now you have build a feature and want to deploy the db changes
+
+create 101-feature-121-structure.sql contains
+
+    CREATE TABLE `Relation` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `fid` int(11) NOT NULL,
+        `data` varchar(100) DEFAULT 'data',  
+        PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create 301-feature-121-fk.sql contains
+
+    ALTER TABLE Relation ADD CONSTRAINT fk_RelT2 FOREIGN KEY (fid) REFERENCES Table1(id);
+
+now run sqlpile again
+
+    ./sqlpile.sh --new --verbose --user deployment --password xxxxxx /home/jami/sqlpile/test/data-db
+
+and you see that only the feature scripts are imported
 
 Parameter
 =========
