@@ -74,10 +74,11 @@ function deploy {
     local output="${opdir}/${opoutput}"
     local outputbuffer=""
 
-    if [ "$opmode" == "scaffold" ]; then
+    if [ "${opmode}" == "scaffold" ]; then
         local sffiles=( "000-cleaning.sql" "100-structure.sql" "200-modify.sql" "300-constraints.sql" "400-data.sql" )
-        for f in $sffiles; do
+        for f in "${sffiles[@]}"; do
             if [ ! -s "${opdir}/${f}" ]; then
+                echo_v "creating scaffold file ${opdir}/${f}"
                 touch "${opdir}/${f}"
             fi
         done
@@ -99,17 +100,20 @@ function deploy {
         case "$opmode" in
             append )
                 if [ $new -eq 1 ]; then
+                    echo_v "append ${filename}"
                     outputbuffer+=$(cat "${opdir}/${filename}")
                     outputbuffer+=$'\n'
                 fi
             ;;
             all )
+                echo_v "append ${filename}"
                 outputbuffer+=$(cat "${opdir}/${filename}")
                 outputbuffer+=$'\n'
             ;;
         esac                
     done    
 
+    echo_v "write composer sql ${output}"
     echo "${outputbuffer}" > "${output}"
     ${dbfuncimport} "${output}"
 }
@@ -122,10 +126,12 @@ function showhelp {
     echo -e " -t, --test\t\ttest only. no use of sql driver"
     echo -e " -c, --create\t\tcreates a sql file scaffold in the folder"
     echo -e " -v, --verbose\t\tverbose"
+    echo -e " -u, --user\t\tdatabase username"
+    echo -e " -p, --password\t\tdatabase password"
+    echo -e " -o, --output\t\tcomposer output filename"
 }
 
-OPT=$(getopt -o o:u:p:cantv -l "output:,user:,password:,create,all,new,test,verbose" -n "sqlpile.sh" -- "$@");
-#OPT=`getopt --long -o "o:u:p:cantv" "$@"`
+OPT=$(getopt -o o:u:p:cantv -l "output:,user:,password:,create,all,new,test,verbose" -n "sqlpile.sh" -- "$@")
 eval set -- "$OPT"
 while true; do
     case "$1" in
@@ -164,7 +170,6 @@ while true; do
         ;;
         --)
             shift
-            break
         ;;
         *)
             if [ ${#1} -gt 1 ]; then
