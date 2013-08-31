@@ -1,0 +1,2 @@
+-- constraints
+ALTER TABLE Table2 ADD CONSTRAINT fk_T1T2 FOREIGN KEY (fid) REFERENCES Table1(id);
