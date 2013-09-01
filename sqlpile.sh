@@ -7,6 +7,7 @@ dbuser="sqlpile"
 dbpass=
 dbname=
 verbose=0
+testing=0
 
 dbfuncimport="mysqlimport"
 
@@ -62,6 +63,10 @@ function historycontains {
 }
 
 function writehistoryfile {    
+    if [ $testing == "1" ]; then
+        return 0
+    fi
+
     local tmp=$IFS
     IFS=$'\n'
     for file in "${historylist[@]}"; do
@@ -162,6 +167,7 @@ while true; do
         ;;
         -t|--test )
             dbfuncimport="nop"
+            testing=1
             shift
         ;;
         -v|--verbose )
